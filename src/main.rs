@@ -1,128 +1,77 @@
+mod two_edge_connected;
+use two_edge_connected::*;
+
+#[allow(dead_code)]
+fn graph1() -> (usize, usize, [(usize, usize); 15]) {
+    (
+        8,
+        10,
+        [
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (1, 6),
+            (1, 7),
+            (2, 3),
+            (2, 7),
+            (3, 7),
+            (3, 8),
+            (4, 5),
+            (5, 8),
+            (6, 7),
+            (6, 9),
+            (8, 10),
+            (9, 10),
+        ],
+    )
+}
+
+#[allow(dead_code)]
+fn graph2() -> (usize, usize, [(usize, usize); 11]) {
+    (
+        1,
+        8,
+        [
+            (1, 2),
+            (1, 6),
+            (1, 7),
+            (2, 4),
+            (3, 4),
+            (3, 6),
+            (5, 6),
+            (5, 8),
+            (6, 7),
+            (6, 8),
+            (7, 8),
+        ],
+    )
+}
+
+#[allow(dead_code)]
+fn graph3() -> (usize, usize, [(usize, usize); 12]) {
+    (
+        1,
+        9,
+        [
+            (1, 2),
+            (1, 6),
+            (1, 7),
+            (2, 4),
+            (3, 4),
+            (3, 6),
+            (5, 6),
+            (5, 8),
+            (6, 7),
+            (6, 8),
+            (7, 8),
+            (8, 9),
+        ],
+    )
+}
+
 fn main() {
-    let vertices = 10;
-    let edges = [
-        (1, 2),
-        (1, 3),
-        (1, 4),
-        (1, 6),
-        (1, 7),
-        (2, 3),
-        (2, 7),
-        (3, 7),
-        (3, 8),
-        (4, 5),
-        (5, 8),
-        (6, 7),
-        (6, 9),
-        (8, 10),
-        (9, 10),
-    ];
-
-    let adjacent = convert_to_adjacent(vertices, &edges);
-
-    println!("{}", is_two_edge_connected(&adjacent));
-
-    let mut ans = Vec::new();
-    for bit in 1..1 << vertices {
-        let mut members = Vec::with_capacity(vertices);
-        for t in 0..vertices {
-            if bit >> t & 1 == 1 {
-                members.push(t)
-            }
-        }
-
-        if members.len() < 2 {
-            continue;
-        }
-
-        let compressed = members
-            .iter()
-            .enumerate()
-            .map(|(i, e)| (e + 1, i + 1))
-            .collect::<std::collections::HashMap<_, _>>();
-
-        let u = members.len();
-        let mut es = Vec::new();
-        for &(u, v) in &edges {
-            if members.contains(&(u - 1)) && members.contains(&(v - 1)) {
-                es.push((*compressed.get(&u).unwrap(), *compressed.get(&v).unwrap()))
-            }
-        }
-        let ads = convert_to_adjacent(u, &es);
-        if is_two_edge_connected(&ads) {
-            print_members(&members);
-            ans.push(members)
-        }
-    }
-    println!("size = {}.", ans.len());
-}
-
-fn print_members(members: &[usize]) {
-    println!("{:?}", members.iter().map(|e| e + 1).collect::<Vec<_>>())
-}
-
-fn convert_to_adjacent(vertices: usize, edges: &[(usize, usize)]) -> Vec<Vec<usize>> {
-    let mut adjacent = vec![Vec::new(); vertices];
-    for (u, v) in edges {
-        adjacent[u - 1].push(v - 1);
-        adjacent[v - 1].push(u - 1);
-    }
-    adjacent
-}
-
-fn dfs(
-    before: usize,
-    start: usize,
-    rank: &mut usize,
-    ord: &mut [Option<usize>],
-    low: &mut [usize],
-    adjacent: &[Vec<usize>],
-) {
-    ord[start] = Some(*rank);
-    low[start] = *rank;
-    *rank += 1;
-    for &neighbor in &adjacent[start] {
-        if ord[neighbor].is_none() {
-            dfs(start, neighbor, rank, ord, low, adjacent);
-            low[start] = std::cmp::min(low[start], low[neighbor])
-        } else {
-            if neighbor == before {
-                continue;
-            }
-            low[start] = std::cmp::min(low[start], ord[neighbor].unwrap())
-        }
-    }
-}
-
-fn is_two_edge_connected(adjacent: &[Vec<usize>]) -> bool {
-    let mut ord = vec![None; adjacent.len()];
-    let mut low = vec![std::usize::MAX; adjacent.len()];
-    let mut rank = 0;
-    dfs(std::usize::MAX, 0, &mut rank, &mut ord, &mut low, adjacent);
-
-    if ord.iter().any(|e| e.is_none()) {
-        return false;
-    }
-    let ord = ord.iter().map(|e| e.unwrap()).collect::<Vec<usize>>();
-    let mut visited = vec![false; adjacent.len()];
-
-    !have_bridge(0, &ord, &low, adjacent, &mut visited)
-}
-
-fn have_bridge(
-    start: usize,
-    ord: &[usize],
-    low: &[usize],
-    adjacent: &[Vec<usize>],
-    visited: &mut [bool],
-) -> bool {
-    visited[start] = true;
-    for &neighbor in &adjacent[start] {
-        if !visited[neighbor] {
-            if ord[start] < low[neighbor] || have_bridge(neighbor, ord, low, adjacent, visited) {
-                return true;
-            }
-        }
-    }
-    false
+    // let (k, vertices, edges) = graph1();
+    // let (k, vertices, edges) = graph2();
+    let (k, vertices, edges) = graph3();
+    enumerate_k_sized_two_ege_connected_induced_subgraphs(k, vertices, &edges);
 }
