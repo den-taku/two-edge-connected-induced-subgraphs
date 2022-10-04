@@ -69,9 +69,35 @@ fn graph3() -> (usize, usize, [(usize, usize); 12]) {
     )
 }
 
+#[allow(dead_code)]
+fn graph4() -> (usize, usize, [(usize, usize); 16]) {
+    (
+        1,
+        12,
+        [
+            (1, 2),
+            (1, 5),
+            (1, 6),
+            (2, 3),
+            (3, 4),
+            (4, 5),
+            (4, 11),
+            (4, 12),
+            (5, 7),
+            (6, 7),
+            (7, 8),
+            (7, 10),
+            (7, 11),
+            (8, 9),
+            (9, 10),
+            (10, 12),
+        ],
+    )
+}
+
 fn main() {
     // let (k, vertices, edges) = graph1();
     // let (k, vertices, edges) = graph2();
-    let (k, vertices, edges) = graph3();
+    let (k, vertices, edges) = graph4();
     enumerate_k_sized_two_ege_connected_induced_subgraphs(k, vertices, &edges);
 }

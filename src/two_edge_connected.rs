@@ -35,10 +35,13 @@ pub fn enumerate_k_sized_two_ege_connected_induced_subgraphs(
         }
         let ads = convert_to_adjacent(u, &es);
         if is_two_edge_connected(&ads) {
-            print_members(&members);
+            // print_members(&members);
             ans.push(members)
         }
     }
+    let mut ans = ans.into_iter().map(|e| (e.len(), e)).collect::<Vec<_>>();
+    ans.sort();
+    ans.iter().map(|(_, a)| print_members(a)).count();
     println!("size = {}.", ans.len());
 }
 
