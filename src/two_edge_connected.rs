@@ -41,7 +41,13 @@ pub fn enumerate_k_sized_two_ege_connected_induced_subgraphs(
     }
     let mut ans = ans.into_iter().map(|e| (e.len(), e)).collect::<Vec<_>>();
     ans.sort();
-    ans.iter().map(|(_, a)| print_members(a)).count();
+    ans.iter()
+        .enumerate()
+        .map(|(i, (_, a))| {
+            print!("{} ", i + 1);
+            print_members(a)
+        })
+        .count();
     println!("size = {}.", ans.len());
 }
 
